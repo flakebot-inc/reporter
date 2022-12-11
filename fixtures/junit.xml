@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+    <testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.123" timestamp="2022-12-09T10:21:45.419583" hostname="ff19f549a86b">
+        <testcase classname="api.test_login_view.TestLoginView" name="test_with_google_oauth" time="0.003">
+            <failure message="AssertionError: assert False&#10; +  where False = &lt;built-in method startswith of str object at 0xffff751d0cb0&gt;('https://accounts.google.com/o/oauth2/v2/auth')&#10; +    where &lt;built-in method startswith of str object at 0xffff751d0cb0&gt; = 'foo bar'.startswith">self = &lt;test_login_view.TestLoginView object at 0xffff752c7340&gt;
+
+    def test_with_google_oauth(self):
+        location = "foo bar"
+        assert location is not None
+&gt;       assert location.startswith("https://accounts.google.com/o/oauth2/v2/auth")
+E       AssertionError: assert False
+E        +  where False = &lt;built-in method startswith of str object at 0xffff751d0cb0&gt;('https://accounts.google.com/o/oauth2/v2/auth')
+E        +    where &lt;built-in method startswith of str object at 0xffff751d0cb0&gt; = 'foo bar'.startswith
+
+api/test_login_view.py:5: AssertionError</failure>
+        </testcase>
+    </testsuite>
+</testsuites>
