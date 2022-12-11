@@ -1,4 +1,4 @@
-name: Heroku Deploy
+name: CI
 on: [push, pull_request]
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
         run: go get -v -t -d ./...
 
       - name: Test
-        run: go test
+        run: go test reporter/cmd
 
       - name: Build
         run: go build
