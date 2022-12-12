@@ -22,3 +22,43 @@ jobs:
 
       - name: Build
         run: go build -v
+
+  create-draft-release:
+    name: Create draft release
+
+    # If the push that triggered this is a tag that starts with "v" (e.g., v1.0.0)
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+
+    needs: [build]
+
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.19
+          check-latest: true
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload binaries as build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist/
+          retention-days: 90
+      - name: Set tag name for downstream jobs
+        id: tag
+        run: echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
+
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}

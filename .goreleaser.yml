@@ -1,0 +1,32 @@
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - <<: &build_defaults
+      main: ./main.go
+      binary: "reporter"
+      env:
+        - CGO_ENABLED=0
+      id: linux
+      goos: [linux]
+      goarch: [amd64, arm64]
+
+  - <<: *build_defaults
+    id: macos
+    goos: [darwin]
+    goarch: [amd64, arm64]
+
+  - <<: *build_defaults
+    id: windows
+    goos: [windows]
+    goarch: [amd64]
+
+archives:
+  - id: default
+    format: binary
+    name_template: "{{ .Binary }}-{{ .Os }}-{{ .Arch }}"
+
+release:
+  draft: true
+  prerelease: auto
