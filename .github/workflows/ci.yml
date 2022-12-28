@@ -60,6 +60,11 @@ jobs:
       - name: Set tag name for downstream jobs
         id: tag
         run: echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
+      - name: Create cloudfront invalidation
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: ./scripts/release-cloudfront.sh ${{ secrets.GET_FLAKEBOT_CLOUDFRONT_DISTRIBUTION_ID }}
 
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
