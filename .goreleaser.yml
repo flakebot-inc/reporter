@@ -25,7 +25,12 @@ builds:
 archives:
   - id: default
     format: binary
-    name_template: "{{ .Binary }}-{{ .Os }}-{{ .Arch }}"
+    name_template: "{{ .Os }}-{{ .Arch }}"
+
+blobs:
+  - provider: s3
+    bucket: get-flakebot
+    folder: "reporter/{{.Version}}"
 
 release:
   draft: true
