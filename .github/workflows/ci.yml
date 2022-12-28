@@ -62,6 +62,8 @@ jobs:
         run: echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
       - name: Install AWS CLI
         uses: unfor19/install-aws-cli-action@master
+        with:
+          version: 2
       - name: Create Cloudfront Invalidation
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
