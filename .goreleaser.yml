@@ -29,6 +29,7 @@ archives:
 
 blobs:
   - provider: s3
+    region: us-west-2
     bucket: get-flakebot
     folder: "reporter/{{.Version}}"
 
