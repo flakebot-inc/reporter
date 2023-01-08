@@ -273,8 +273,30 @@ func CreateReport(report Report, apiKey string) error {
 	return nil
 }
 
-func GetMetadata(metadata map[string]interface{}) error {
+// Provider class to get Metadata
+type Provider struct {
+	Name        string
+	GetMetadata func(map[string]interface{}) error
+}
 
+func GetProvider() (Provider, error) {
+	switch {
+	case os.Getenv("GITHUB_ACTIONS") == "true":
+		return Provider{
+			Name:        "github_action",
+			GetMetadata: GetGitHubMetadata,
+		}, nil
+	case os.Getenv("CIRCLECI") == "true":
+		return Provider{
+			Name:        "circle_ci",
+			GetMetadata: GetCircleCIMetadata,
+		}, nil
+	default:
+		return Provider{}, fmt.Errorf("Environment does not appear to be a supported CI provider (CircleCI, GitHub Actions, etc.)")
+	}
+}
+
+func GetGitHubMetadata(metadata map[string]interface{}) error {
 	var githubEnvs = []string{
 		"GITHUB_JOB",
 		"GITHUB_REF",
@@ -290,6 +312,35 @@ func GetMetadata(metadata map[string]interface{}) error {
 	}
 
 	for _, env := range githubEnvs {
+		metadata[env] = os.Getenv(env)
+	}
+
+	return nil
+}
+
+func GetCircleCIMetadata(metadata map[string]interface{}) error {
+	var circleciEnvs = []string{
+		"CIRCLE_BRANCH",
+		"CIRCLE_BUILD_NUM",
+		"CIRCLE_BUILD_URL",
+		"CIRCLE_NODE_INDEX",
+		"CIRCLE_NODE_TOTAL",
+		"CIRCLE_PR_NUMBER",
+		"CIRCLE_PR_USERNAME",
+		"CIRCLE_PR_REPONAME",
+		"CIRCLE_PROJECT_REPONAME",
+		"CIRCLE_PROJECT_USERNAME",
+		"CIRCLE_PULL_REQUEST",
+		"CIRCLE_PULL_REQUESTS",
+		"CIRCLE_REPOSITORY_URL",
+		"CIRCLE_SHA1",
+		"CIRCLE_TAG",
+		"CIRCLE_WORKFLOW_ID",
+		"CIRCLE_WORKFLOW_JOB_ID",
+		"CIRCLE_WORKFLOW_WORKSPACE_ID",
+	}
+
+	for _, env := range circleciEnvs {
 		metadata[env] = os.Getenv(env)
 	}
 
@@ -313,9 +364,14 @@ func HandleReport(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	report := Report{Archive: presignedUrl.Fields.Key, Provider: "github_action", Metadata: map[string]interface{}{}}
+	provider, err := GetProvider()
+	if err != nil {
+		return err
+	}
 
-	err = GetMetadata(report.Metadata)
+	report := Report{Archive: presignedUrl.Fields.Key, Provider: provider.Name, Metadata: map[string]interface{}{}}
+
+	err = provider.GetMetadata(report.Metadata)
 	if err != nil {
 		return err
 	}
