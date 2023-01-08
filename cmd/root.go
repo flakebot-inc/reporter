@@ -281,15 +281,15 @@ type Provider struct {
 
 func GetProvider() (Provider, error) {
 	switch {
-	case os.Getenv("GITHUB_ACTIONS") == "true":
-		return Provider{
-			Name:        "github_action",
-			GetMetadata: GetGitHubMetadata,
-		}, nil
 	case os.Getenv("CIRCLECI") == "true":
 		return Provider{
 			Name:        "circle_ci",
 			GetMetadata: GetCircleCIMetadata,
+		}, nil
+	case os.Getenv("GITHUB_ACTIONS") == "true":
+		return Provider{
+			Name:        "github_action",
+			GetMetadata: GetGitHubMetadata,
 		}, nil
 	default:
 		return Provider{}, fmt.Errorf("Environment does not appear to be a supported CI provider (CircleCI, GitHub Actions, etc.)")
